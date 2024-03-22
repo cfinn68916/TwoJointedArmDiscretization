@@ -1,6 +1,5 @@
 // hi
 #include <iostream>
-#include <utility>
 #include "cmath"
 #include "vector"
 // a b
@@ -83,10 +82,9 @@ double s2(Vec2 theta){
 
 double mc1=(m1*r1+m2*l1)*g;
 double mc2=m2*r2*g;
-double mc3=m2*r2*g;
 Vec2 tg(Vec2 theta){
     double mcc12=c12(theta);
-    return {mc1*c1(theta)+mc2*mcc12,mc3*mcc12};
+    return {mc1*c1(theta)+mc2*mcc12,mc2*mcc12};
 }
 double mcs2preq=m2*l1*r2;
 Mat corriolis(Vec2 theta, Vec2 omega){
