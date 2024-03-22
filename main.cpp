@@ -1,38 +1,7 @@
-// hi
 #include <iostream>
 #include "cmath"
 #include "vector"
-// a b
-// c d
-// [a,b,c,d]
-// a
-// b
-// [a,b]
-
-
-struct Mat{
-    double a=0;
-    double b=0;
-    double c=0;
-    double d=0;
-};
-
-struct Vec2{
-    double a=0;
-    double b=0;
-};
-
-struct Vec4{
-    double a=0;
-    double b=0;
-    double c=0;
-    double d=0;
-};
-Vec4 ccat(Vec2 a, Vec2 b){
-    return {a.a,a.b,b.a,b.b};
-}
-
-
+#include "src/VecUtils.h"
 
 double I1=1.0;
 double I2=1.0;
@@ -43,22 +12,6 @@ double r2=0.5;
 double g=9.8;
 double l1=1.0;
 
-
-Mat matInv(Mat inp){
-    double det=inp.a*inp.d-inp.b*inp.c;
-    return {inp.d/det,-inp.b/det,-inp.c/det,inp.a/det};
-}
-
-Vec2 vecMul(Mat mat, Vec2 vec){
-    return {mat.a*vec.a+mat.b*vec.b,mat.c*vec.a+mat.d*vec.b};
-}
-
-Vec2 plus(Vec2 lhs, Vec2 rhs){
-    return {lhs.a+rhs.a,lhs.b+rhs.b};
-}
-Vec2 um(Vec2 lhs){
-    return {-lhs.a,-lhs.b};
-}
 
 double c1(Vec2 theta){
     return cos(theta.a);
@@ -109,20 +62,20 @@ Mat M(Vec2 theta){
 }
 
 Vec2 alpha(Vec2 theta, Vec2 omega){
-    return vecMul(matInv(M(theta)),um(plus(vecMul(corriolis(theta,omega),omega),tg(theta))));
+    return -(M(theta).inv()*((corriolis(theta,omega)*omega)+tg(theta)));
 }
 
 
 
 // {theta1,theta2,omega1,omega2}
-Vec4 propagate(Vec4 state, double dt){
-    Vec2 a=alpha({state.a,state.b},{state.c,state.d});
-    return {state.a+dt*(state.c+a.a*dt/2),state.b+dt*(state.d+a.b*dt/2),state.c+a.a*dt,state.d+a.b*dt};
+State propagate(State state, double dt){
+    Vec2 a=alpha(state.pos,state.vel);
+    return {state.pos+(state.vel+a*dt*0.5)*dt,state.vel+(a*dt)};
 }
 
-Vec4 euler(Vec4 state, double totalT, double dt){
+State euler(State state, double totalT, double dt){
     double t=0;
-    Vec4 statecp=state;
+    State statecp=state;
     while(totalT-t>dt){
         statecp=propagate(statecp, dt);
         t+=dt;
@@ -139,7 +92,7 @@ double vdiff(std::vector<double> state1,std::vector<double> state2){
 
 
 int main() {
-    Vec4 st2{1.0, 1.0, 0, 0};
+    State st2{{1.0, 1.0}, {0, 0}};
     for (int i = 0; i < 1000; i++) {
 //        std::cout << 0.02 * i  << "     " << st2.a << " " << st2.b << "\n";
         st2 = euler(st2, 0.02, 1E-9);
