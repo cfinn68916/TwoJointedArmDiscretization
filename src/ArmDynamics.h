@@ -18,7 +18,8 @@ Vec2 tg(Vec2 theta);
 Mat coriolis(Vec2 theta, Vec2 omega);
 Mat M(Vec2 theta);
 
-Vec2 alpha(Vec2 theta, Vec2 omega);
+Vec2 alpha(Vec2 theta, Vec2 omega, Vec2 torque);
+Vec2 torques(Vec2 theta, Vec2 omega, Vec2 alpha);
 
 Vec2 anglesToPos(Vec2 theta);
 Vec2Pair posToAngles(Vec2 pos);

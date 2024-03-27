@@ -2,8 +2,8 @@
 
 using namespace ArmConstants;
 
-Vec2 alpha(Vec2 theta, Vec2 omega) {
-    return -(M(theta).inv()*((coriolis(theta,omega)*omega)+tg(theta)));
+Vec2 alpha(Vec2 theta, Vec2 omega, Vec2 torque) {
+    return -(M(theta).inv()*((coriolis(theta,omega)*omega)+tg(theta)-torque));
 }
 
 Mat M(Vec2 theta) {
@@ -42,4 +42,8 @@ Vec2Pair posToAngles(Vec2 pos){
     double theta_2=acos((pos.a*pos.a+pos.b*pos.b-l1*l1-l2*l2)/(2*l1*l2));
     double atanxy= atan2(pos.b,pos.a);
     return {{atanxy-atan((l2*sin(-theta_2))/(l1+l2*cos(-theta_2))),-theta_2},{atanxy-atan((l2*sin(theta_2))/(l1+l2*cos(theta_2))),theta_2}};
+}
+
+Vec2 torques(Vec2 theta, Vec2 omega, Vec2 alpha){
+    return (M(theta)*alpha)+(coriolis(theta,omega)*omega)+tg(theta);
 }

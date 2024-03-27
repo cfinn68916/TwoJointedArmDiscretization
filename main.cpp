@@ -7,7 +7,7 @@
 
 // {theta1,theta2,omega1,omega2}
 State propagate(State state, double dt){
-    Vec2 a=alpha(state.pos,state.vel);
+    Vec2 a=alpha(state.pos,state.vel, torques({1,1},{0,0},{0,0}));
     return {state.pos+(state.vel+a*dt*0.5)*dt,state.vel+(a*dt)};
 }
 
