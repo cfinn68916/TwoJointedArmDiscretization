@@ -34,3 +34,12 @@ Vec2 tg(Vec2 theta) {double mc1= (m1 * r1 + m2 * l1) * g;
     return {mc1*cos(theta.a)+mc2*mcc12,mc2*mcc12};
 }
 
+Vec2 anglesToPos(Vec2 theta){
+    return {l1*cos(theta.a)+l2*cos(theta.a+theta.b),l1*sin(theta.a)+l2*sin(theta.a+theta.b)};
+}
+
+Vec2Pair posToAngles(Vec2 pos){
+    double theta_2=acos((pos.a*pos.a+pos.b*pos.b-l1*l1-l2*l2)/(2*l1*l2));
+    double atanxy= atan2(pos.b,pos.a);
+    return {{atanxy-atan((l2*sin(-theta_2))/(l1+l2*cos(-theta_2))),-theta_2},{atanxy-atan((l2*sin(theta_2))/(l1+l2*cos(theta_2))),theta_2}};
+}

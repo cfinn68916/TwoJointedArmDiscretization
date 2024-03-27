@@ -11,6 +11,11 @@ public:
     Vec2(double a, double b) : a(a), b(b) {}
 };
 
+struct Vec2Pair{
+    Vec2 a;
+    Vec2 b;
+};
+
 struct State{
     Vec2 pos;
     Vec2 vel;

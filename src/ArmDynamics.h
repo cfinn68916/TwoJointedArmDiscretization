@@ -19,3 +19,6 @@ Mat coriolis(Vec2 theta, Vec2 omega);
 Mat M(Vec2 theta);
 
 Vec2 alpha(Vec2 theta, Vec2 omega);
+
+Vec2 anglesToPos(Vec2 theta);
+Vec2Pair posToAngles(Vec2 pos);
