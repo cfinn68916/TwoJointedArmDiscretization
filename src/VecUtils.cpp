@@ -1,3 +1,4 @@
+#include <cmath>
 #include "VecUtils.h"
 
 Vec2 Vec2::operator+(Vec2 rhs) {
@@ -14,6 +15,10 @@ Vec2 Vec2::operator-() {
 
 Vec2 Vec2::operator*(double rhs) {
     return {a*rhs, b*rhs};
+}
+
+double Vec2::Norm() {
+    return hypot(a,b);
 }
 
 Mat Mat::operator+(Mat rhs) {

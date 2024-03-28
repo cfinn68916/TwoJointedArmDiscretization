@@ -9,6 +9,7 @@ public:
     Vec2 operator-();
     Vec2 operator*(double rhs);
     Vec2(double a, double b) : a(a), b(b) {}
+    double Norm();
 };
 
 struct Vec2Pair{
