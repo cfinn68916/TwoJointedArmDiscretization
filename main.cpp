@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include "src/MotorDynamics.h"
+#include "src/ArmTrajectory.h"
 
 
 State propagate(State state, Vec2 u, double dt){
@@ -30,6 +31,13 @@ Vec2 torquesForGoal(State s){
         std::cout <<"hiii\n";
     }
     return torques(s.pos,s.vel,{calcAccel(s.vel.a,s.pos.a,goal_a,1,9),calcAccel(s.vel.b,s.pos.b,goal_b,1,9)});
+}
+
+Vec2 torquesForTraj(State s,Trajectory traj, double time){
+    TrajState trajState=traj.getAtTime(time);
+    Vec2 rv=trajState.vel+((trajState.pos-s.pos)*40);
+    Vec2 ra=trajState.accel+((rv-s.vel)*40);
+    return torques(trajState.pos,rv,ra);
 }
 
 
@@ -86,23 +94,54 @@ int main() {
 
 
     State st2{{5*M_PI/8,M_PI/2}, {0, 0}};
+    Vec2 intiPos{5*M_PI/8,M_PI/2};
+    Vec2 goalPos{3*M_PI/8,3*M_PI/2};
+    Trajectory st{{
+                          intiPos,
+                          interpolate(intiPos,goalPos,0.010),
+                          interpolate(intiPos,goalPos,0.020),
+                          interpolate(intiPos,goalPos,0.030),
+                          interpolate(intiPos,goalPos,0.040),
+                          interpolate(intiPos,goalPos,0.050),
+                          interpolate(intiPos,goalPos,0.100),
+                          interpolate(intiPos,goalPos,0.200),
+                          interpolate(intiPos,goalPos,0.300),
+                          interpolate(intiPos,goalPos,0.400),
+                          interpolate(intiPos,goalPos,0.500),
+                          interpolate(intiPos,goalPos,0.600),
+                          interpolate(intiPos,goalPos,0.700),
+                          interpolate(intiPos,goalPos,0.800),
+                          interpolate(intiPos,goalPos,0.900),
+                          interpolate(intiPos,goalPos,0.950),
+                          interpolate(intiPos,goalPos,0.960),
+                          interpolate(intiPos,goalPos,0.970),
+                          interpolate(intiPos,goalPos,0.980),
+                          interpolate(intiPos,goalPos,0.990),
+                          goalPos
+        },1};
 
     f << "<line x1=\"" << 300 << "\" y1=\"" << 300 << "\" x2=\"" << 300+100*ArmConstants::l1*cos(st2.pos.a)<< "\" y2=\"" << 300-100*ArmConstants::l1*sin(st2.pos.a)<< "\" stroke=\"#FF00FF\" stroke-width=\"1\" />";
     f << "<line x1=\"" << 300+100*ArmConstants::l1*cos(st2.pos.a) << "\" y1=\"" << 300-100*ArmConstants::l1*sin(st2.pos.a) << "\" x2=\"" << 300+100*(ArmConstants::l1*cos(st2.pos.a)+ArmConstants::l2*cos(st2.pos.a+st2.pos.b)) << "\" y2=\"" << 300-100*(ArmConstants::l1*sin(st2.pos.a)+ArmConstants::l2*sin(st2.pos.a+st2.pos.b)) << "\" stroke=\"#FF00FF\" stroke-width=\"1\" />";
 
-    double a=3.2/0.02;
+    double a=1/0.02;
+    // Trapezoidal profiles 3.2
+    // trajectory 1.8
+
     State st3{{2.0, 2.0}, {0, 0}};
     for (int i = 0; i < a; i++) {
         if(((int) a)-1==i){
+            if((goalPos-st2.pos).Norm()<0.01){
+            std::cout << "good ";
+            }
             std::cout<<"end\n";
         }
 //        std::cout << 0.02 * i  << "     " << st2.pos.a << " " << st2.pos.b << "\n";
-        st2 = euler(st2, 0.02, 1E-6, clamp(torqueToVoltage(torquesForGoal(st2), st2.vel)));
+        st2 = euler(st2, 0.02, 1E-6, clamp(torqueToVoltage(torquesForTraj(st2,st,0.02*i), st2.vel)));
 
         f << "<line x1=\"" << angleToSvg(st3.pos).a << "\" y1=\"" << angleToSvg(st3.pos).b << "\" x2=\"" << angleToSvg(st2.pos).a<< "\" y2=\"" << angleToSvg(st2.pos).b << "\" stroke=\"#"
           << toTwoHex(256.0*i/a) <<toTwoHex((256.0*(a-i)/a)) << "00\" stroke-width=\"1\" />";
 
-        st3=st2;
+        st3={st2.pos,st2.vel};
     }
 
     f << "<line x1=\"" << 300 << "\" y1=\"" << 300 << "\" x2=\"" << 300+100*ArmConstants::l1*cos(st2.pos.a)<< "\" y2=\"" << 300-100*ArmConstants::l1*sin(st2.pos.a)<< "\" stroke=\"#00FFFF\" stroke-width=\"1\" />";
